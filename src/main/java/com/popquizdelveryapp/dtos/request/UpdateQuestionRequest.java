@@ -4,15 +4,19 @@ import com.popquizdelveryapp.data.model.Difficulty;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+import java.time.LocalDateTime;
 @Getter
-public class AddQuestionRequest {
+@Setter
+
+public class UpdateQuestionRequest {
+    private String id;
     private String questionText;
     private String option1;
     private String option2;
     private String option3;
     private String option4;
-    private String category;
     private String correctAnswer;
+    private String category;
     private Difficulty difficultyLevel;
+    private LocalDateTime dateCreated = LocalDateTime.now();
 }

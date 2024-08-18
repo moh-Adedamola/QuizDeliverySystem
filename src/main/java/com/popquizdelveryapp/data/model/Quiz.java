@@ -9,14 +9,11 @@ import java.util.List;
 
 @Getter
 @Setter
-
 public class Quiz {
     @Id
-
     private String id;
     private String title;
-    private String description;
     private List<Question> questions;
-    private LocalDateTime dateCreated;
+    private LocalDateTime dateCreated = LocalDateTime.now();
 
 }
