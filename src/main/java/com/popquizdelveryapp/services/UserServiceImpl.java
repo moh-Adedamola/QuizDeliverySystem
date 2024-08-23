@@ -6,9 +6,7 @@ import com.popquizdelveryapp.data.model.UserAttempt;
 import com.popquizdelveryapp.data.repositories.UserRepository;
 import com.popquizdelveryapp.dtos.request.*;
 import com.popquizdelveryapp.dtos.response.*;
-import com.popquizdelveryapp.exception.UserAlreadyExistException;
-import com.popquizdelveryapp.exception.UserNotFoundException;
-import com.popquizdelveryapp.exception.UsernameOrPasswordException;
+import com.popquizdelveryapp.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RegisterResponse register(RegisterRequest registerRequest) {
+        validateRegisterRequest(registerRequest);
         validateEmail(registerRequest.getEmail());
         User newUser = new User();
         newUser.setFirstName(registerRequest.getFirstName());
@@ -45,17 +44,17 @@ public class UserServiceImpl implements UserService {
         String password = loginRequest.getPassword();
 
         for (User user : userRepository.findAll()) {
-            if (user.getEmail().equals(email)){
-                if (user.getPassword().equals(password)){
-                    user.setLogin(true);
-                    userRepository.save(user);
-                    LoginResponse loginResponse = new LoginResponse();
-                    loginResponse.setMessage("Login Successful");
-                    return loginResponse;
-                } else {
-                    throw new UsernameOrPasswordException("Invalid username or password");
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                if (user.getPassword().equals(password)) {
+                        user.setLogin(true);
+                        userRepository.save(user);
+                        LoginResponse loginResponse = new LoginResponse();
+                        loginResponse.setMessage("Login Successful");
+                        return loginResponse;
+                    } else {
+                        throw new UsernameOrPasswordException("Invalid username or password");
+                    }
                 }
-            }
         }
         throw new UserNotFoundException("User does not exist");
     }
@@ -141,8 +140,28 @@ public class UserServiceImpl implements UserService {
             if (user.getEmail().equals(email)) {
                 throw new UserAlreadyExistException("User with same email already exist");
             }
+
+
+
+
         }
     }
 
+    private void validateRegisterRequest(RegisterRequest registerRequest) {
+        if (registerRequest.getFirstName().trim().isEmpty()) {
+            throw new InvalidRequestException("First name cannot be empty");
+        }
+        if (registerRequest.getLastName().trim().isEmpty()) {
+            throw new InvalidRequestException("Last name cannot be empty");
+        }
+        if (registerRequest.getEmail().trim().isEmpty()) {
+            throw new InvalidRequestException("Email cannot be empty");
+        }
+        if (registerRequest.getPassword().trim().isEmpty()) {
+            throw new InvalidRequestException("Password cannot be empty");
+        }
 
+    }
 }
+
+
